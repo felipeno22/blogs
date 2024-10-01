@@ -1,0 +1,66 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Editar Comentários') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="container">
+            <div class="bg-white p-5 shadow-lg rounded-lg">
+
+                <!-- Mensagem de sucesso -->
+                @if(session('msg'))
+                    <div class="alert alert-success text-center">{{ session('msg') }}</div>
+                @endif
+
+                <!-- Formulário de Edição de Categorias -->
+                <form action='{{ route("comments.update", $comment->id )}}' name="cadcomments" method="post">
+                    @csrf
+                    @method('PATCH')
+                    <fieldset class="mb-4">
+                        <legend>Preencha todos os campos</legend>
+
+                        <!-- Campo hidden para o ID do usuário -->
+                        <input type="hidden" id="user_id" value="{{ Auth::user()->id }}" name="user_id">
+
+                        <div class="mb-3">
+                            <label for="author" class="form-label">Autor</label>
+                            <input type="text" id="author" value="{{ $comment->user->name }}" maxlength="100" required autofocus name="author" class="form-control" >
+                        </div>
+
+
+
+                        <!-- Campo contéudo  do Comentário-->
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Contéudo</label>
+                            <input type="text" id="content" value="{{ $comment->content }}" maxlength="255" required autofocus name="content" class="form-control" placeholder="Digite o comentário">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="post_id">Posts</label>
+                            <select name="post_id" id="post_id" class="form-control" required>
+                                <option value="">Selecione um Post</option>
+                                @foreach ($posts as $post)
+                                    <option value="{{ $post->id }}" {{ $post->id == $comment->post_id ? 'selected' : '' }}  >
+                                        {{ $post->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+
+
+
+                    </fieldset>
+
+                    <!-- Botão de Alterar -->
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary">Alterar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</x-app-layout>
