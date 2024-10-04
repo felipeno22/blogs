@@ -278,6 +278,37 @@ public function storeComment(Request $request, $postId)
     return redirect()->route('dashboard')->with('success', 'Comentário adicionado!');
 }
 
+public function storeComment2(Request $request, $postId)
+{
+    $request->validate([
+        'author' => 'required|string',
+        'content' => 'required|string',
+    ]);
+
+
+
+    $comments = new Comments();
+    $comments->post_id = $postId;
+    $comments->user_id = $request->user_id;
+    $comments->content = $request->content;
+
+    // Filtrar os dados da requisição para incluir apenas os campos que você deseja atualizar
+    $requestOnly = $request->only(['user_id', 'content']);
+
+    // Preencher o modelo com os dados filtrados
+    $comments->fill($requestOnly);
+
+    $comments->save();
+
+
+    // Retornar o novo comentário como JSON
+    return response()->json([
+        'comment' => $comments->load('user'), // Carregar o relacionamento com 'user'
+        'message' => 'Comentário adicionado com sucesso!'
+    ]);
+}
+
+
 public function filterByCategory($category_id)
 {
     // Pega os posts que pertencem a essa categoria

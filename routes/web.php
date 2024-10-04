@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
      //tela de exclusão de  posts
      Route::get('/confirm-delete-posts/{post}',[PostsController::class, 'confirm_delete_posts'])->name('confirm.delete.posts');
 
-     Route::post('/posts/{post}/comment', [PostsController::class, 'storeComment'])->name('posts.comment');
+     Route::post('/posts/{post}/comment', [PostsController::class, 'storeComment2'])->name('posts.comment');
 
 
     // definindo as rotas para category

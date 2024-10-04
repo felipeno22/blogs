@@ -1,6 +1,24 @@
+<script>
+   // document.getElementById('toggleCommentForm').addEventListener('click', function() {
+
+   function formComment(commentFormId){
+    var form = document.getElementById(commentFormId);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            this.textContent = 'Fechar Comentário';
+        } else {
+            form.style.display = 'none';
+            this.textContent = 'Adicionar Comentário';
+        }
+   }
+
+    //});
+
+
+</script>
+
 <x-app-layout>
     <x-slot name="header">
-
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Blog') }}
         </h2>
@@ -10,8 +28,6 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="lg:flex lg:space-x-6 overflow-hidden shadow-sm sm:rounded-lg">
-
-
 
                 <!-- Seção Lateral (Sidebar) para Categorias ou Tags -->
                 <div class="lg:w-1/4 w-full p-6 bg-white dark:bg-gray-900">
@@ -45,28 +61,23 @@
                     </div>
                 </div>
 
-
                 <!-- Seção de Listagem de Posts -->
                 <div class="lg:w-3/4 w-full p-6 text-gray-900 bg-white">
                     <div class="container">
-
-
-
                         <div class="titlebar flex justify-between items-center mb-6">
                             <h1 class="text-3xl font-bold"><strong>Meus Posts</strong></h1>
 
                             @if (isset($search))
-                            <label><strong>Resultados da busca por: posts "{{ $search }}"</strong></label>
-                        @endif
+                                <label><strong>Resultados da busca por: posts "{{ $search }}"</strong></label>
+                            @endif
 
-                        @if (isset($search_tag))
-                            <label><strong>Resultados da busca por: tag"{{ $search_tag }}"</strong></label>
-                        @endif
+                            @if (isset($search_tag))
+                                <label><strong>Resultados da busca por: tag"{{ $search_tag }}"</strong></label>
+                            @endif
 
-                        @if (isset($search_cate))
-                            <label><strong>Resultados da busca por : categoria "{{ $search_cate }}"</strong></label>
-                        @endif
-
+                            @if (isset($search_cate))
+                                <label><strong>Resultados da busca por : categoria "{{ $search_cate }}"</strong></label>
+                            @endif
                         </div>
 
                         <hr class="mb-6"> <!-- Linha de separação -->
@@ -87,72 +98,116 @@
                                     </div>
                                     <p class="mt-4">{{ $post->content }}</p>
 
-                                     <!-- Exibir Comentários -->
-                                    <div class="bg-gray-100 p-2  rounded-md">
-                                    <h4 class="mt-6 mb-4">Comentários:</h4>
+                                    <!-- Exibir Comentários -->
+                                    <div id="comentsArea" class="bg-gray-100 p-2 rounded-md">
+                                        <h4 class="mt-6 mb-4">Comentários:</h4>
 
+                                        @if ($post->comments->isEmpty())
+                                        <div id="commentList{{ $post->id }}" >
 
-                                     @if ($post->comments->isEmpty())
-                                            <p>Sem comentários até agora.</p>
+                                        </div>
                                         @else
+                                        <div id="commentList{{ $post->id }}" style="overflow:scroll;max-height:200px;" >
                                             @foreach ($post->comments as $comment)
-                                                <div class="bg-white border-b-2 comment mb-3">
-                                                    <div class="ml-2">
-
-                                                        <img  style="width:30px;"src="{{ $comment->user->profile_picture == null ? asset('storage/profile_pictures/perfil.jpg') : asset('storage/' . $comment->user->profile_picture )}}" class="h-8 w-8 rounded-full" alt="Foto de perfil">
-                                                        <strong>{{ $comment->user->name}}</strong> <small>{{ $comment->created_at->format('d/m/Y H:i') }}</small>
-
-                                                     </div>
-
-
-                                                    <p>{!!$comment->content!!}</p>
-
+                                                <div  class="bg-white border-b-2 comment mb-3 p-2">
+                                                    <div class="ml-2 flex items-center">
+                                                        <img style="width:20px;" src="{{ $comment->user->profile_picture == null ? asset('storage/profile_pictures/perfil.jpg') : asset('storage/' . $comment->user->profile_picture )}}" class="h-6 w-6 rounded-full" alt="Foto de perfil">
+                                                        <strong class="ml-2">{{ $comment->user->name}}</strong> <small class="ml-2">{{ $comment->created_at->format('d/m/Y H:i') }}</small>
+                                                    </div>
+                                                    <p class="ml-8 text-sm">{!!$comment->content!!}</p>
                                                 </div>
                                             @endforeach
+                                        </div>
                                         @endif
 
-                                    <!-- Formulário para Adicionar Comentário -->
-                                    <h4 class="mt-6 mb-4">Deixe seu comentário:</h4>
-                                    <form action="{{ route('posts.comment', $post->id) }}" method="POST" class="container col-md-8">
-                                        @csrf
+                                        <button id="toggleCommentForm" class="btn btn-secondary" onclick="formComment('commentForm{{ $post->id }}')">Adicionar Comentário</button>
 
-                                        <input type="text" id="user_id" value="{{ Auth::user()->id }}" name="user_id" hidden />
-                                        <div class="mb-3 row">
-                                            <label for="author" class="col-form-label col-md-2">Nome:</label>
-                                            <div class="col-md-10">
-                                                <input type="text" name="author" class="form-control" required value="{{ Auth::user()->name }}">
-                                            </div>
+
+                                       <!-- Formulário para Adicionar Comentário -->
+                                        <div id="commentForm{{ $post->id }}" style="display: none;" > <!-- Escondido inicialmente -->
+                                            <h4 class="mt-6 mb-4">Deixe seu comentário:</h4>
+                                            <form  id="addCommentForm{{ $post->id }}"  class="container col-md-8">
+
+
+                                                <input type="text" id="user_id" value="{{ Auth::user()->id }}" name="user_id" hidden />
+                                                <div class="mb-3 row">
+                                                    <label for="author" class="col-form-label col-md-2">Nome:</label>
+                                                    <div class="col-md-10">
+                                                    <input type="text" name="author" class="form-control form-control-sm" required value="{{ Auth::user()->name }}">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3 row">
+                                                    <label for="content" class="col-form-label col-md-2">Comentário:</label>
+                                                    <div class="col-md-10">
+                                                        <textarea id="content{{ $post->id }}" name="content" class="form-control form-control-sm" rows="2" required></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <button   type="submit" onclick="msg(event , this.closest('form'), {{ $post->id }})" class="btn btn-primary btn-sm">Enviar</button>
+                                                </div>
+                                            </form>
+
+                                            <script>
+
+                                                    function msg(event,formElement,id) {
+                                                        event.preventDefault(); // Impede o envio do formulário
+
+                                                        let formData = new FormData(formElement);
+                                                        //alert(formData.get("content"))
+                                                        fetch(`/posts/${id}/comment`, {
+                                                            method: 'POST',
+                                                            headers: {
+                                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                                        },body: formData
+                                                        }).then(response => response.json())
+                                                        .then(data => {
+
+                if (data.comment) {
+                                                                     // Adicionar o comentário à lista de comentários
+                let commentList = document.getElementById('commentList'+id);
+
+
+
+
+                let newComment = `
+                     <div  class="bg-white border-b-2 comment mb-3 p-2">
+                        <div class="ml-2 flex items-center">
+                            <img style="width:30px;" src="${data.comment.user.profile_picture ? '/storage/' + data.comment.user.profile_picture : '/storage/profile_pictures/perfil.jpg'}" class="h-8 w-8 rounded-full" alt="Foto de perfil">
+                            <strong class="ml-2">${data.comment.user.name}</strong> <small class="ml-2">${new Date(data.comment.created_at).toLocaleString()}</small>
+                        </div>
+                        <p>${data.comment.content}</p>
+                    </div>`;
+                    commentList.innerHTML += newComment;
+                // Limpar o campo de comentário
+                document.getElementById("content"+id).value = '';
+
+
+                }
+
+
+                }).catch(error => console.error('Erro ao adicionar comentário:', error));
+
+  }
+
+                                            </script>
+
                                         </div>
-                                        <div class="mb-3 row">
-                                            <label for="content" class="col-form-label col-md-2">Comentário:</label>
-                                            <div class="col-md-10">
-                                                <textarea name="content" class="form-control" rows="4" required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-primary">Enviar</button>
-                                        </div>
-                                    </form>
                                     </div>
                                     <hr class="mt-4">
                                 </div>
-                                    @endforeach
-                                    @else
-                                        <p>Nenhum post encontrado.</p>
+                            @endforeach
+                        @else
+                            <p>Nenhum post encontrado.</p>
+                            <hr class="mt-4">
+                        @endif
 
-                                        <hr class="mt-4">
-                                    @endif
-
-
-
-                                <br><br>
-                                <div class="p-6 bg-gray-300 text-gray-900">
-                                    <div class="p-3 bg-gray-188 rounded-lg">
-                                         <!-- Links de paginação -->
-                                    {{ $posts->links() }}
-
-                                    </div>
-                                </div>
+                        <br><br>
+                        <div class="p-6 bg-gray-300 text-gray-900">
+                            <div class="p-3 bg-gray-188 rounded-lg">
+                                <!-- Links de paginação -->
+                                {{ $posts->links() }}
+                            </div>
+                        </div>
 
                     </div>
                 </div>
