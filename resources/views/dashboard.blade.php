@@ -96,7 +96,7 @@
                                             <small class="text-gray-500">Publicado em {{ $post->created_at->format('d/m/Y H:i') }}</small>
                                         </div>
                                     </div>
-                                    <p class="mt-4">{{ $post->content }}</p>
+                                    <p id="pcontent" class="mt-4">{!! $post->content !!}</p>
 
                                     <!-- Exibir Comentários -->
                                     <div id="comentsArea" class="bg-gray-100 p-2 rounded-md">
@@ -153,7 +153,7 @@
                                                         event.preventDefault(); // Impede o envio do formulário
 
                                                         let formData = new FormData(formElement);
-                                                        //alert(formData.get("content"))
+                                                        //alert(formData.get("author"))
                                                         fetch(`/posts/${id}/comment`, {
                                                             method: 'POST',
                                                             headers: {
@@ -162,8 +162,11 @@
                                                         }).then(response => response.json())
                                                         .then(data => {
 
+
                 if (data.comment) {
-                                                                     // Adicionar o comentário à lista de comentários
+
+
+                    // Adicionar o comentário à lista de comentários
                 let commentList = document.getElementById('commentList'+id);
 
 
@@ -180,6 +183,7 @@
                     commentList.innerHTML += newComment;
                 // Limpar o campo de comentário
                 document.getElementById("content"+id).value = '';
+                commentList.scrollTop = commentList.scrollHeight;
 
 
                 }
@@ -205,7 +209,10 @@
                         <div class="p-6 bg-gray-300 text-gray-900">
                             <div class="p-3 bg-gray-188 rounded-lg">
                                 <!-- Links de paginação -->
-                                {{ $posts->links() }}
+                                <!-- esse request()->query() permite que qualquer parametro
+                                passado para url seja mantido na paginação-->
+                                {{ $posts->appends(request()->query())->links() }}
+
                             </div>
                         </div>
 

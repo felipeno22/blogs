@@ -48,7 +48,6 @@
         </textarea>
 
 
-        </div>
 
         <div class="form-group">
             <label for="category_id">Categoria</label>
@@ -105,7 +104,17 @@ function acao(){
 
     ClassicEditor
         .create(document.querySelector('#content'), {
-            toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
+            toolbar: [
+                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote',
+                'insertTable', 'mediaEmbed', 'undo', 'redo', 'imageUpload'
+            ],
+            ckfinder: {
+                // Configurações para uploads de imagem (opcional)
+                uploadUrl:'/upload-image',
+            },
+            mediaEmbed: {
+                previewsInData: true
+            }
         }).then(editor => {
 
              // Definindo estilos iniciais

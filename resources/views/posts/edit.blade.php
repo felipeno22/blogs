@@ -1,3 +1,13 @@
+<!-- CSS para garantir o estilo persistente do ckeditor5 -->
+<style>
+    .ck-editor__editable {
+        min-height: 200px;
+        height: 200px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+</style>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -26,12 +36,16 @@
             <input type="text" name="title" id="title" class="form-control" value="{{ $post->title }}" required>
         </div>
 
-        <div class="form-group">
+       <!-- <div class="form-group">
             <label for="content">Conteúdo</label>
             <textarea name="content" id="content" rows="6" maxlength="1000" class="form-control" required>
                 {!!$post->content!!}
             </textarea>
-        </div>
+        </div>-->
+
+        <textarea name="content" id="content" >
+            {!!$post->content!!}
+        </textarea>
 
         <div class="form-group">
             <label for="category_id">Categoria</label>
@@ -80,3 +94,50 @@
 </div>
 </div>
 </x-app-layout>
+<script>
+    function acao(){
+
+        // Função para salvar o conteúdo no textarea escondido
+        document.querySelector('form').addEventListener('submit', () => {
+            document.querySelector('#content').value = editor.getData();
+        });
+    }
+
+
+        ClassicEditor
+            .create(document.querySelector('#content'), {
+                toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+                ckfinder: {
+                    // Configurações para uploads de imagem (opcional)
+                    uploadUrl: '/upload-image',
+                },
+                mediaEmbed: {
+                    previewsInData: true
+                }
+            }).then(editor => {
+
+                 // Definindo estilos iniciais
+        const editableElement = editor.ui.view.editable.element;
+        applyCustomStyles(editableElement);
+
+        // Evento para aplicar os estilos ao focar no editor
+        editor.editing.view.document.on('focus', () => {
+            applyCustomStyles(editableElement);
+        });
+
+        // Função para aplicar estilos personalizados
+        function applyCustomStyles(element) {
+            element.style.minHeight = '200px';  // Define a altura mínima
+            element.style.height = '200px';  // Define a altura
+            element.style.border = '1px solid #ddd'; // Define a borda
+            element.style.padding = '10px'; // Define o padding
+            element.style.backgroundColor = '#f9f9f9'; // Define cor de fundo
+
+        }
+
+
+    }) .catch(error => {
+                console.error(error);
+            });
+    </script>
+

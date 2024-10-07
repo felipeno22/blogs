@@ -22,10 +22,10 @@ class PostsController extends Controller
     {
 
 // Admin e Author podem acessar todas as rotas, exceto o dashboard
-$this->middleware('can:autoriza_admin_author')->except(['dashboard','storeComment']);
+$this->middleware('can:autoriza_admin_author')->except(['dashboard','storeComment','storeComment2']);
 
 // Todos os usuários (admin, author, e user) podem acessar o dashboard
-$this->middleware('can:autoriza_todos_users')->only(['dashboard','storeComment']);
+$this->middleware('can:autoriza_todos_users')->only(['dashboard','storeComment','storeComment2']);
 
 
 
@@ -291,6 +291,8 @@ public function storeComment2(Request $request, $postId)
     $comments->post_id = $postId;
     $comments->user_id = $request->user_id;
     $comments->content = $request->content;
+
+
 
     // Filtrar os dados da requisição para incluir apenas os campos que você deseja atualizar
     $requestOnly = $request->only(['user_id', 'content']);

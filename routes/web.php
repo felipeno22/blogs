@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     //return view('welcome');
     return view('auth.login_imagem_fundo');
-});
+})->name('imagem.fundo');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -69,6 +70,8 @@ Route::middleware('auth')->group(function () {
      Route::get('/category/{category}', [PostsController::class, 'filterByCategory'])->name('posts.category');
      Route::get('/tag/{tag}', [PostsController::class, 'filterByTag'])->name('posts.tag');
      Route::get('/posts/search', [PostsController::class, 'filterBySearch'])->name('posts.search');
+
+     Route::post('/upload-image', [ImageUploadController::class, 'upload'])->name('upload.image');
 
 
     });
