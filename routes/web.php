@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
@@ -72,6 +73,10 @@ Route::middleware('auth')->group(function () {
      Route::get('/posts/search', [PostsController::class, 'filterBySearch'])->name('posts.search');
 
      Route::post('/upload-image', [ImageUploadController::class, 'upload'])->name('upload.image');
+
+     Route::post('posts/{post}/like', [LikeController::class, 'likePost'])->name('posts.like');
+     Route::post('posts/{post}/unlike', [LikeController::class, 'unlikePost'])->name('posts.unlike');
+
 
 
     });

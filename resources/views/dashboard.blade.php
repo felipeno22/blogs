@@ -115,12 +115,20 @@
                                                         <strong class="ml-2">{{ $comment->user->name}}</strong> <small class="ml-2">{{ $comment->created_at->format('d/m/Y H:i') }}</small>
                                                     </div>
                                                     <p class="ml-8 text-sm">{!!$comment->content!!}</p>
+
                                                 </div>
                                             @endforeach
                                         </div>
                                         @endif
 
                                         <button id="toggleCommentForm" class="btn btn-secondary" onclick="formComment('commentForm{{ $post->id }}')">Adicionar Comentário</button>
+
+                                        <div id="btlike{{ $post->id }}">
+                                        <button class="like-btn btn btn-secondary btn-sm" data-post-id="{{ $post->id }}">
+                                            <i class="fas fa-thumbs-up"></i>{{$post->userLiked==true ? "Curtido":"Curtir"}} <p>{{ $post->likes->count() }} curtidas</p>
+                                        </button>
+                                        </div>
+
 
 
                                        <!-- Formulário para Adicionar Comentário -->
@@ -222,3 +230,41 @@
         </div>
     </div>
 </x-app-layout>
+<script>
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            let postId = this.getAttribute('data-post-id');
+            fetch(`/posts/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                },
+            }).then(response =>response.json())
+                .then(data =>{
+                // Adicionar o comentário à lista de comentários
+                //let divlike = document.getElementsByClassName('btlike');
+                let divlike = document.querySelector(`#btlike${postId}`);
+
+                if(data.message=="Você já curtiu este post."){
+
+
+
+                }else{
+
+                    divlike.innerHTML="";
+                    let newLike = `<button class="like-btn btn btn-secondary btn-sm" data-post-id="${postId}">
+                                            <i class="fas fa-thumbs-up"></i> Curtido <p> ${data.like_count} curtidas</p>
+                                        </button>`;
+                    divlike.innerHTML += newLike;
+
+
+                }
+
+
+
+
+        });
+        });
+    });
+</script>

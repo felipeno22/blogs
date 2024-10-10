@@ -43,6 +43,10 @@ $this->middleware('can:autoriza_todos_users')->only(['dashboard','storeComment',
     $posts = Posts::where('status', 'published')->with('comments')->paginate(5); // 5 posts por página;
 
 
+    foreach ($posts as $post) {
+        $post->userLiked = $post->likes()->where('user_id', Auth::id())->exists();
+    }
+
          // Busca as tags apenas desse usuário
     $tags = Tag::all();
 

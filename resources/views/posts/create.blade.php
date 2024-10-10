@@ -108,6 +108,7 @@ function acao(){
                 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote',
                 'insertTable', 'mediaEmbed', 'undo', 'redo', 'imageUpload'
             ],
+
             ckfinder: {
                 // Configurações para uploads de imagem (opcional)
                 uploadUrl:'/upload-image',

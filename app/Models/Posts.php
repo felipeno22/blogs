@@ -45,4 +45,10 @@ public function comments(){
 
 }
 
+    public function likes()
+    {
+        return $this->hasMany(Like::class,'post_id');
+    }
+
+
 }
