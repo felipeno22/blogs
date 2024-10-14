@@ -40,11 +40,12 @@ $this->middleware('can:autoriza_todos_users')->only(['dashboard','storeComment',
         //  $posts = $posts->get();
 
         // Busca todos os posts e seus comentários
-    $posts = Posts::where('status', 'published')->with('comments')->paginate(5); // 5 posts por página;
+    $posts = Posts::where('status', 'published')->with('comments') ->orderBy('created_at', 'desc')->paginate(5); // 5 posts por página;
+
 
 
     foreach ($posts as $post) {
-        $post->userLiked = $post->likes()->where('user_id', Auth::id())->exists();
+        $post->user_liked = $post->likes()->where('user_id', Auth::id())->exists();
     }
 
          // Busca as tags apenas desse usuário
@@ -141,7 +142,6 @@ $posts = $posts->paginate(5)->appends($request->query());
         $post->category_id = $request->category_id;
         $post->status = $request->status;
         $post->slug = $request->slug;
-        $post->save();
 
          // Filtrar os dados da requisição para incluir apenas os campos que você deseja atualizar
          $requestOnly = $request->only(['title','user_id', 'content', 'category_id','status','slug','tags']);
@@ -167,6 +167,8 @@ $posts = $posts->paginate(5)->appends($request->query());
     {
         //
     }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -321,7 +323,7 @@ public function filterByCategory($category_id)
     //posts = Posts::where('category_id', $category_id)->get();//versao nao paginada
 
      // Pega os posts que pertencem a essa categoria com paginação
-     $posts = Posts::where('status', 'published')->where('category_id', $category_id)->with('comments')->paginate(5); // 5 posts por página
+     $posts = Posts::where('status', 'published')->where('category_id', $category_id)->with('comments')->orderBy('created_at', 'desc')->paginate(5); // 5 posts por página
 
     $tags = Tag::all();
     $categories = Category::all();
@@ -339,7 +341,7 @@ public function filterByTag($tag_id)
     // Pega os posts que pertencem a essa tag com paginação
     $posts = Posts::whereHas('tags', function($query) use ($tag_id) {
         $query->where('tag_id', $tag_id);
-    })->where('status', 'published')->with('comments')->paginate(5); // 5 posts por página
+    })->where('status', 'published')->with('comments')->orderBy('created_at', 'desc')->paginate(5); // 5 posts por página
 
     $tags = Tag::all();
     $categories = Category::all();
@@ -359,7 +361,7 @@ public function filterBySearch(Request $request)
 
     // Pega os posts cujo título ou conteúdo correspondem à busca, com paginação
     $posts = Posts::where('status', 'published')->with('comments')->where('title', 'LIKE', '%' . $search . '%')
-    ->orWhere('content', 'LIKE', '%' . $search . '%')
+    ->orWhere('content', 'LIKE', '%' . $search . '%')->orderBy('created_at', 'desc')
     ->paginate(5); // 5 posts por página
 
     $tags = Tag::all();

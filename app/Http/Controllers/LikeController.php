@@ -16,7 +16,17 @@ class LikeController extends Controller
 
         // Verifica se o usuário já deu like neste post
         if ($post->likes()->where('user_id', Auth::user()->id)->exists()) {
-            return response()->json(['message' => 'Você já curtiu este post.', 'user_liked' => true], 403);
+
+            // se o like existe e remove
+            $post->likes()->where('user_id', Auth::user()->id)->delete();
+             // Conta o número total de curtidas para o post
+            $likeCount = $post->likes()->count();
+
+            $user_liked = $post->likes()->where('user_id', Auth::id())->exists();
+
+                 return response()->json(['message' => 'Curtida removida.','like_count' =>$likeCount,'user_liked' =>$user_liked]);
+
+                // return response()->json(['message' => 'Você já curtiu este post.', 'user_liked' => true], 403);
         }
 
         // Salva o like
@@ -27,10 +37,12 @@ class LikeController extends Controller
          // Conta o número total de curtidas para o post
          $likeCount = $post->likes()->count();
 
-        return response()->json(['message' => 'Post curtido com sucesso.','like_count' =>$likeCount, 'user_liked' => true]);
+         $user_liked = $post->likes()->where('user_id', Auth::id())->exists();
+
+        return response()->json(['message' => 'Post curtido com sucesso.','like_count' =>$likeCount, 'user_liked' => $user_liked]);
     }
 
-    public function unlikePost($id)
+  /*  public function unlikePost($id)
     {
         $post = Posts::findOrFail($id);
 
@@ -38,5 +50,5 @@ class LikeController extends Controller
         $post->likes()->where('user_id', Auth::user()->id)->delete();
 
         return response()->json(['message' => 'Curtida removida.']);
-    }
+    }*/
 }

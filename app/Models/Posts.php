@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 
 class Posts extends Model
 {
@@ -40,7 +42,7 @@ public function user()
 
 
 public function comments(){
-    return $this->hasMany(Comments::class,'post_id');
+    return $this->hasMany(Comments::class,'post_id')->orderBy('created_at', 'desc');
 
 
 }
@@ -48,6 +50,30 @@ public function comments(){
     public function likes()
     {
         return $this->hasMany(Like::class,'post_id');
+    }
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Gera o slug automaticamente antes de salvar o post
+        static::creating(function ($post) {
+           // $post->slug = Str::slug($post->title);
+           $slug = Str::slug($post->title);
+           $originalSlug = $slug;
+
+           // Verifica se o slug já existe e incrementa se necessário
+           $count = 1;
+           while (Posts::where('slug', $slug)->exists()) {
+               $slug = "{$originalSlug}-{$count}";
+               $count++;
+           }
+
+           $post->slug = $slug;
+       });
+
+
     }
 
 

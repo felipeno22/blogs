@@ -92,11 +92,17 @@
                                             <img class="img-fluid" style="max-width:20%;" src="/images/icon_blog.png" alt="Blog Icon">
                                         </div>
                                         <div class="w-3/4">
-                                            <h4 class="text-xl font-semibold">{{ $post->title }}</h4>
+                                            <h4 class="text-xl font-semibold">
+                                            <a href="">
+                                                {{ $post->title }}
+                                            </a>
+                                        </h4>
                                             <small class="text-gray-500">Publicado em {{ $post->created_at->format('d/m/Y H:i') }}</small>
                                         </div>
                                     </div>
-                                    <p id="pcontent" class="mt-4">{!! $post->content !!}</p>
+                                    <p id="pcontent" class="mt-4">
+                                        <p>{!! Str::limit($post->content, 800) !!}</p>
+
 
                                     <!-- Exibir Comentários -->
                                     <div id="comentsArea" class="bg-gray-100 p-2 rounded-md">
@@ -107,7 +113,7 @@
 
                                         </div>
                                         @else
-                                        <div id="commentList{{ $post->id }}" style="overflow:scroll;max-height:200px;" >
+                                        <div id="commentList{{ $post->id }}" style="border:2px solid gray;overflow:scroll;max-height:200px;background:white" >
                                             @foreach ($post->comments as $comment)
                                                 <div  class="bg-white border-b-2 comment mb-3 p-2">
                                                     <div class="ml-2 flex items-center">
@@ -121,13 +127,15 @@
                                         </div>
                                         @endif
 
+                                    <div style="display: flex; align-items: center; gap: 10px;">
                                         <button id="toggleCommentForm" class="btn btn-secondary" onclick="formComment('commentForm{{ $post->id }}')">Adicionar Comentário</button>
 
                                         <div id="btlike{{ $post->id }}">
                                         <button class="like-btn btn btn-secondary btn-sm" data-post-id="{{ $post->id }}">
-                                            <i class="fas fa-thumbs-up"></i>{{$post->userLiked==true ? "Curtido":"Curtir"}} <p>{{ $post->likes->count() }} curtidas</p>
+                                            <i class="fas fa-thumbs-up"></i>{{$post->user_liked==true ? "Curtido":"Curtir"}} <br> <small>{{ $post->likes->count() }} curtidas</small>
                                         </button>
                                         </div>
+                                    </div>
 
 
 
@@ -188,10 +196,12 @@
                         </div>
                         <p>${data.comment.content}</p>
                     </div>`;
-                    commentList.innerHTML += newComment;
+                    //commentList.innerHTML += newComment;
+                     // Insere o novo comentário no topo da lista
+                commentList.insertAdjacentHTML('afterbegin', newComment);
                 // Limpar o campo de comentário
                 document.getElementById("content"+id).value = '';
-                commentList.scrollTop = commentList.scrollHeight;
+                //commentList.scrollTop = commentList.scrollHeight;
 
 
                 }
@@ -231,8 +241,12 @@
     </div>
 </x-app-layout>
 <script>
-    document.querySelectorAll('.like-btn').forEach(button => {
-        button.addEventListener('click', function() {
+  document.querySelectorAll('.like-btn').forEach(button => {
+    button.addEventListener('click', handleLike);
+});
+
+function handleLike() {
+
             let postId = this.getAttribute('data-post-id');
             fetch(`/posts/${postId}/like`, {
                 method: 'POST',
@@ -242,29 +256,37 @@
                 },
             }).then(response =>response.json())
                 .then(data =>{
+
                 // Adicionar o comentário à lista de comentários
                 //let divlike = document.getElementsByClassName('btlike');
                 let divlike = document.querySelector(`#btlike${postId}`);
+                divlike.innerHTML="";
+                if(data.message=="Curtida removida."){
 
-                if(data.message=="Você já curtiu este post."){
+                    let newLike = `<button class="like-btn btn btn-secondary btn-sm" data-post-id="${postId}">
+                                            <i class="fas fa-thumbs-up"></i> ${data.user_liked==true ? "Curtido": "Curtir"} <br><small> ${data.like_count} curtidas</small>
+                                        </button>`;
+                    divlike.innerHTML += newLike;
 
 
 
                 }else{
 
-                    divlike.innerHTML="";
+
                     let newLike = `<button class="like-btn btn btn-secondary btn-sm" data-post-id="${postId}">
-                                            <i class="fas fa-thumbs-up"></i> Curtido <p> ${data.like_count} curtidas</p>
+                                            <i class="fas fa-thumbs-up"></i> ${data.user_liked==true ? "Curtido": "Curtir"} <br><small> ${data.like_count} curtidas</small>
                                         </button>`;
                     divlike.innerHTML += newLike;
 
 
                 }
 
+                     // Reanexar o evento após substituir o HTML
+                     divlike.querySelector('.like-btn').addEventListener('click',handleLike);
 
 
 
         });
-        });
-    });
+
+}
 </script>
